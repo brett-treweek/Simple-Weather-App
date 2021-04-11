@@ -10,8 +10,6 @@ const icon = document.querySelector('#icon');
 const temp = document.querySelector('#temp');
 
 
-
-
 searchBox.addEventListener('keypress', setCity)
 searchButton.addEventListener('click', getWeather);
 
@@ -22,36 +20,62 @@ function setCity(enter){
 }
 
 function getWeather(){
-    const citySearch = document.querySelector('#searchInput');
-    const city = citySearch.value;
+    
+    if(searchBox.value == ''){
+        cityHeading.innerText = 'Please Enter A City';
+    }else{
+    
+    const city = searchBox.value;
     const base = 'https://api.openweathermap.org/data/2.5/weather';
     const query = `?q=${city}&units=metric&appid=${key}`;
+
     fetch(base + query)
         .then(function (response) {
         return response.json();})
         .then(function (data) {
+
             cityHeading.innerText = data.name + ' ';
             const cityLat = data.coord.lat;
             const cityLon = data.coord.lon;
             const oneBase = 'https://api.openweathermap.org/data/2.5/onecall';
             const oneQuery = `?lat=${cityLat}&lon=${cityLon}&exclude=minutely,hourly&units=metric&appid=${key}`;
+
     fetch(oneBase + oneQuery)
         .then(function (response) {
             return response.json();})
         .then(function (data) {
-            console.log(data);
+
             var date = (data.current.dt);
             var timestamp = moment.unix(date);
-            // var degree = data.current.wind_dir;
+            
+
             cityDate.innerText = timestamp.format('dddd Do MMMM');
             temp.innerText =' ' + Math.round(data.current.temp);
             icon.innerHTML = '<img src= ./assets/weatherIcons/'+ data.current.weather[0].icon+'.png>';
-            wind.innerText = data.current.wind_speed + ' m/s';
+            var wind_dir = data.current.wind_deg;
+            console.log(wind_dir)
+            if(wind_dir<22.5){
+                wind_dir = 'N'
+            }else if(wind_dir<67.5){
+                wind_dir = 'NE'
+            }else if(wind_dir<112.5){
+                wind_dir = 'E'
+            }else if(wind_dir<157.5){
+                wind_dir = 'SE'
+            }else if(wind_dir<202.5){
+                wind_dir = 'S'
+            }else if(wind_dir<247.5){
+                wind_dir = 'SW'
+            }else if(wind_dir<292.5){
+                wind_dir = 'W'
+            }else if(wind_dir<337.5){
+                wind_dir = 'NW'
+            }else wind_dir = 'N';
+
+            wind.innerText = Math.round(data.current.wind_speed) + ' m/s '+ wind_dir;
             uv.innerText = data.current.uvi;
             humidity.innerText = data.current.humidity + ' %';
             
-
-
             const day1 = document.querySelector('#day1')
             const day2 = document.querySelector('#day2')
             const day3 = document.querySelector('#day3')
@@ -63,6 +87,12 @@ function getWeather(){
             day3.firstElementChild.textContent = moment.unix(data.daily[3].dt).format('dddd Do MMMM')
             day4.firstElementChild.textContent = moment.unix(data.daily[4].dt).format('dddd Do MMMM')
             day5.firstElementChild.textContent = moment.unix(data.daily[5].dt).format('dddd Do MMMM')
+
+            day1.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[1].weather[0].icon+".png>";
+            day2.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[2].weather[0].icon+".png>";
+            day3.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[3].weather[0].icon+".png>";
+            day4.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[4].weather[0].icon+".png>";
+            day5.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[5].weather[0].icon+".png>";
             
             day1.children[2].append(' '+ Math.round(data.daily[1].temp.max)+'\u00B0'+'C')
             day2.children[2].append(' '+ Math.round(data.daily[2].temp.max)+'\u00B0'+'C')
@@ -82,115 +112,17 @@ function getWeather(){
             day4.children[4].append(' '+ data.daily[4].humidity+'%')
             day5.children[4].append(' '+ data.daily[5].humidity+'%')
 
-            day1.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[1].weather[0].icon+".png>";
-            day2.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[2].weather[0].icon+".png>";
-            day3.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[3].weather[0].icon+".png>";
-            day4.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[4].weather[0].icon+".png>";
-            day5.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[5].weather[0].icon+".png>";
 
 
-
-
-
+            console.log(data)
 
             
 
-        }
-  
-)})
-};
+            console.log(wind_dir)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// var fiveDayArray = [day1, day2, day3, day4, day5]
-
-//  for (let i = 1; i < data.daily[5]; i++) {
-//                 const dayArrayElement = fiveDayArray[index];
-//                 console.log(dayArrayElement)
-//              for (let index = 0; index < fiveDayArray.length; index++) {
-                
-//                 dayArrayElement.firstChild.innerText = data.daily[i].temp.max; 
-
-// }}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// console.log(timestamp.format('dddd Do MMMM'));
-//             function  windDirection(degree){
-//                 if (degree>337.5) return 'Northerly';
-//                 if (degree>292.5) return 'North Westerly';
-//                 if (degree>247.5) return 'Westerly';
-//                 if (degree>202.5) return 'South Westerly';
-//                 if (degree>157.5) return 'Southerly';
-//                 if (degree>122.5) return 'South Easterly';
-//                 if (degree>67.5) return 'Easterly';
-//                 if (degree>22.5) return 'North Easterly';
-//                 return 'Northerly';
-//             }
-
-// console.log( timestamp.format("HH/mm/ss") );
-
-
-
-// daily[0].dt
-
-
-
-
-// console.log(data.main.temp);
-
-
-// icon fetch------------------------------------
-// icon.innerText = data.weather[0].icon;
-// http://openweathermap.org/img/wn/10d@2x.png
-
-
-
-
-
-
-
+        })
+    })
+}};
 
 
