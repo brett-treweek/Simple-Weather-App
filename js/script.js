@@ -8,35 +8,67 @@ const uv = document.querySelector('#uv');
 const humidity = document.querySelector('#humidity');
 const icon = document.querySelector('#icon');
 const temp = document.querySelector('#temp');
+const ul = document.querySelector('#ul');
+const list = document.querySelector('.list')
+var dailyWeather;
+var searchHistory = [];
 
 
-searchBox.addEventListener('keypress', setCity)
+
+
+
+
+
+
+
+
+searchBox.addEventListener('keypress', setCity);
 searchButton.addEventListener('click', getWeather);
+list.addEventListener('click', historyClick);
 
 function setCity(enter){
     if (enter.keyCode == 13) {
-        getWeather()
+        getWeather();
     }
 }
 
+
+function historyClick(){
+     
+}
+
+
+
+
+
+// localStorage.clear()
+
+
 function getWeather(){
-    
-    if(searchBox.value == ''){
-        cityHeading.innerText = 'Please Enter A City';
-    }else{
-    
-    const city = searchBox.value;
+    var city = searchBox.value;
+    searchHistory.push(searchBox.value);
+    localStorage.setItem('city', searchHistory)
+    var li = document.createElement('li')
+
+    for (let i = 0; i < searchHistory.length; i++) {
+        const element = searchHistory[i];
+        li.textContent = element;
+        ul.appendChild(li);
+        li.classList.add('list')
+    }
+    console.log(searchHistory)
+
     const base = 'https://api.openweathermap.org/data/2.5/weather';
     const query = `?q=${city}&units=metric&appid=${key}`;
-
+    
     fetch(base + query)
         .then(function (response) {
         return response.json();})
-        .then(function (data) {
+        .then(function (cityData) {
 
-            cityHeading.innerText = data.name + ' ';
-            const cityLat = data.coord.lat;
-            const cityLon = data.coord.lon;
+            cityHeading.innerText = cityData.name + ' ';
+            const cityLat = cityData.coord.lat;
+            const cityLon = cityData.coord.lon;
             const oneBase = 'https://api.openweathermap.org/data/2.5/onecall';
             const oneQuery = `?lat=${cityLat}&lon=${cityLon}&exclude=minutely,hourly&units=metric&appid=${key}`;
 
@@ -44,17 +76,28 @@ function getWeather(){
         .then(function (response) {
             return response.json();})
         .then(function (data) {
-
-            var date = (data.current.dt);
-            var timestamp = moment.unix(date);
             
+            dailyWeather = data;
+            console.log(dailyWeather);
+            todaysWeather();
+            forecast();
+        })
+        
+    })
+};
 
-            cityDate.innerText = timestamp.format('dddd Do MMMM');
-            temp.innerText =' ' + Math.round(data.current.temp);
-            icon.innerHTML = '<img src= ./assets/weatherIcons/'+ data.current.weather[0].icon+'.png>';
-            var wind_dir = data.current.wind_deg;
-            console.log(wind_dir)
-            if(wind_dir<22.5){
+
+
+function todaysWeather(){
+    temp.innerText =' ' + Math.round(dailyWeather.current.temp);
+    var date = (dailyWeather.current.dt);
+    var timestamp = moment.unix(date);
+    cityDate.innerText = timestamp.format('dddd Do MMMM');
+    icon.innerHTML = '<img src= ./assets/weatherIcons/'+ dailyWeather.current.weather[0].icon+'.png>';
+    uv.innerText = dailyWeather.current.uvi;
+    humidity.innerText = dailyWeather.current.humidity + ' %';
+    var wind_dir = dailyWeather.current.wind_deg;
+    if(wind_dir<22.5){
                 wind_dir = 'N'
             }else if(wind_dir<67.5){
                 wind_dir = 'NE'
@@ -72,57 +115,56 @@ function getWeather(){
                 wind_dir = 'NW'
             }else wind_dir = 'N';
 
-            wind.innerText = Math.round(data.current.wind_speed) + ' m/s '+ wind_dir;
-            uv.innerText = data.current.uvi;
-            humidity.innerText = data.current.humidity + ' %';
+    wind.innerText = Math.round(dailyWeather.current.wind_speed) + ' m/s '+ wind_dir;
+}
+
+
             
+function forecast(){
+
             const day1 = document.querySelector('#day1')
             const day2 = document.querySelector('#day2')
             const day3 = document.querySelector('#day3')
             const day4 = document.querySelector('#day4')
             const day5 = document.querySelector('#day5')
             
-            day1.firstElementChild.textContent = moment.unix(data.daily[1].dt).format('dddd Do MMMM')
-            day2.firstElementChild.textContent = moment.unix(data.daily[2].dt).format('dddd Do MMMM')
-            day3.firstElementChild.textContent = moment.unix(data.daily[3].dt).format('dddd Do MMMM')
-            day4.firstElementChild.textContent = moment.unix(data.daily[4].dt).format('dddd Do MMMM')
-            day5.firstElementChild.textContent = moment.unix(data.daily[5].dt).format('dddd Do MMMM')
+            day1.firstElementChild.textContent = moment.unix(dailyWeather.daily[1].dt).format('dddd Do MMMM')
+            day2.firstElementChild.textContent = moment.unix(dailyWeather.daily[2].dt).format('dddd Do MMMM')
+            day3.firstElementChild.textContent = moment.unix(dailyWeather.daily[3].dt).format('dddd Do MMMM')
+            day4.firstElementChild.textContent = moment.unix(dailyWeather.daily[4].dt).format('dddd Do MMMM')
+            day5.firstElementChild.textContent = moment.unix(dailyWeather.daily[5].dt).format('dddd Do MMMM')
 
-            day1.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[1].weather[0].icon+".png>";
-            day2.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[2].weather[0].icon+".png>";
-            day3.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[3].weather[0].icon+".png>";
-            day4.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[4].weather[0].icon+".png>";
-            day5.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+data.daily[5].weather[0].icon+".png>";
+            day1.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+dailyWeather.daily[1].weather[0].icon+".png>";
+            day2.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+dailyWeather.daily[2].weather[0].icon+".png>";
+            day3.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+dailyWeather.daily[3].weather[0].icon+".png>";
+            day4.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+dailyWeather.daily[4].weather[0].icon+".png>";
+            day5.children[1].innerHTML = "<img src= ./assets/weatherIcons/"+dailyWeather.daily[5].weather[0].icon+".png>";
             
-            day1.children[2].append(' '+ Math.round(data.daily[1].temp.max)+'\u00B0'+'C')
-            day2.children[2].append(' '+ Math.round(data.daily[2].temp.max)+'\u00B0'+'C')
-            day3.children[2].append(' '+ Math.round(data.daily[3].temp.max)+'\u00B0'+'C')
-            day4.children[2].append(' '+ Math.round(data.daily[4].temp.max)+'\u00B0'+'C')
-            day5.children[2].append(' '+ Math.round(data.daily[5].temp.max)+'\u00B0'+'C')
+            day1.children[2].innerText = 'Temp '+ Math.round(dailyWeather.daily[1].temp.max)+'\u00B0'+'C'
+            day2.children[2].innerText ='Temp '+ Math.round(dailyWeather.daily[2].temp.max)+'\u00B0'+'C'
+            day3.children[2].innerText ='Temp '+ Math.round(dailyWeather.daily[3].temp.max)+'\u00B0'+'C'
+            day4.children[2].innerText ='Temp '+ Math.round(dailyWeather.daily[4].temp.max)+'\u00B0'+'C'
+            day5.children[2].innerText ='Temp '+ Math.round(dailyWeather.daily[5].temp.max)+'\u00B0'+'C'
 
-            day1.children[3].append(' ' +Math.round(data.daily[1].wind_speed)+ ' m/s')
-            day2.children[3].append(' ' +Math.round(data.daily[2].wind_speed)+ ' m/s')
-            day3.children[3].append(' ' +Math.round(data.daily[3].wind_speed)+ ' m/s')
-            day4.children[3].append(' ' +Math.round(data.daily[4].wind_speed)+ ' m/s')
-            day5.children[3].append(' ' +Math.round(data.daily[5].wind_speed)+ ' m/s')
+            day1.children[3].innerText ='Wind ' +Math.round(dailyWeather.daily[1].wind_speed)+ ' m/s'
+            day2.children[3].innerText ='Wind ' +Math.round(dailyWeather.daily[2].wind_speed)+ ' m/s'
+            day3.children[3].innerText ='Wind ' +Math.round(dailyWeather.daily[3].wind_speed)+ ' m/s'
+            day4.children[3].innerText ='Wind ' +Math.round(dailyWeather.daily[4].wind_speed)+ ' m/s'
+            day5.children[3].innerText ='Wind ' +Math.round(dailyWeather.daily[5].wind_speed)+ ' m/s'
 
-            day1.children[4].append(' '+ data.daily[1].humidity+'%')
-            day2.children[4].append(' '+ data.daily[2].humidity+'%')
-            day3.children[4].append(' '+ data.daily[3].humidity+'%')
-            day4.children[4].append(' '+ data.daily[4].humidity+'%')
-            day5.children[4].append(' '+ data.daily[5].humidity+'%')
+            day1.children[4].innerText ='Humidity '+ dailyWeather.daily[1].humidity+'%'
+            day2.children[4].innerText ='Humidity '+ dailyWeather.daily[2].humidity+'%'
+            day3.children[4].innerText ='Humidity '+ dailyWeather.daily[3].humidity+'%'
+            day4.children[4].innerText ='Humidity '+ dailyWeather.daily[4].humidity+'%'
+            day5.children[4].innerText ='Humidity '+ dailyWeather.daily[5].humidity+'%'
 
+           } 
 
-
-            console.log(data)
 
             
 
-            console.log(wind_dir)
 
 
-        })
-    })
-}};
+       
 
 
