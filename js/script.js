@@ -1,3 +1,5 @@
+// Variables / Selectors-------------------------------------
+
 const key = '7ab7e1141f7f2e8aa639df16840788da';
 const searchButton = document.querySelector('#searchBtn');
 const searchBox = document.querySelector('#searchInput');
@@ -7,56 +9,98 @@ const wind = document.querySelector('#wind');
 const uv = document.querySelector('#uv');
 const humidity = document.querySelector('#humidity');
 const icon = document.querySelector('#icon');
+const description = document.querySelector('#description');
 const temp = document.querySelector('#temp');
-const ul = document.querySelector('#ul');
-const list = document.querySelector('.list')
+var list = document.querySelector('.list')
+
 var dailyWeather;
-var searchHistory = [];
+var searchHistory = JSON.parse(localStorage.getItem('city')) || [];
 
 
 
-
-
-
-
-
-
+// Event listeners--------------------------------------------
 
 searchBox.addEventListener('keypress', setCity);
-searchButton.addEventListener('click', getWeather);
-list.addEventListener('click', historyClick);
+searchButton.addEventListener('click', search);
+const ul = document.querySelector('#ul');
+ul.addEventListener('click', historyClick);
+// if(searchHistory.length > 0){
+    
+//     }
+ 
+function search(){
+    ul.innerHTML = '';
+    getWeather();
+    searchBox.value = '';
+}
+
+function historyClick(e){
+    ul.innerHTML = '';
+    var text = e.target.textContent;
+    searchBox.value = text;
+    console.log(text);
+    getWeather();
+    searchBox.value = '';
+}
 
 function setCity(enter){
     if (enter.keyCode == 13) {
+        ul.innerHTML = '';
         getWeather();
+        searchBox.value = ''
     }
 }
 
+// History function--------------------------------------------
 
-function historyClick(){
-     
-}
-
+    
 
 
 
-
-// localStorage.clear()
-
-
-function getWeather(){
-    var city = searchBox.value;
-    searchHistory.push(searchBox.value);
-    localStorage.setItem('city', searchHistory)
-    var li = document.createElement('li')
-
+function setHistory(){
+  
     for (let i = 0; i < searchHistory.length; i++) {
+        var li = document.createElement('li')
         const element = searchHistory[i];
         li.textContent = element;
         ul.appendChild(li);
         li.classList.add('list')
     }
+
+    
+
     console.log(searchHistory)
+}   
+
+// localStorage.clear()
+
+
+setHistory();
+getWeather();
+
+
+
+// Fetch requests / History for-loop / Local Storage / City name-------------
+
+function getWeather(){
+    
+    var city = searchBox.value;
+
+    if(city.length>0){
+        searchHistory.unshift(searchBox.value);
+        if(searchHistory.length > 6){
+            searchHistory.pop()
+        };
+        localStorage.setItem('city', JSON.stringify(searchHistory))
+        setHistory();
+    }
+    else if(searchHistory.length == 0){
+        city = 'Perth'
+    }
+    else 
+        city=searchHistory[searchHistory.length-1]
+    
+    console.log(city)
 
     const base = 'https://api.openweathermap.org/data/2.5/weather';
     const query = `?q=${city}&units=metric&appid=${key}`;
@@ -87,39 +131,43 @@ function getWeather(){
 };
 
 
+// Todays weather function----------------------------------------------
 
 function todaysWeather(){
+
     temp.innerText =' ' + Math.round(dailyWeather.current.temp);
     var date = (dailyWeather.current.dt);
     var timestamp = moment.unix(date);
     cityDate.innerText = timestamp.format('dddd Do MMMM');
     icon.innerHTML = '<img src= ./assets/weatherIcons/'+ dailyWeather.current.weather[0].icon+'.png>';
+    description.innerText = dailyWeather.current.weather[0].description;
     uv.innerText = dailyWeather.current.uvi;
     humidity.innerText = dailyWeather.current.humidity + ' %';
     var wind_dir = dailyWeather.current.wind_deg;
+
     if(wind_dir<22.5){
-                wind_dir = 'N'
-            }else if(wind_dir<67.5){
-                wind_dir = 'NE'
-            }else if(wind_dir<112.5){
-                wind_dir = 'E'
-            }else if(wind_dir<157.5){
-                wind_dir = 'SE'
-            }else if(wind_dir<202.5){
-                wind_dir = 'S'
-            }else if(wind_dir<247.5){
-                wind_dir = 'SW'
-            }else if(wind_dir<292.5){
-                wind_dir = 'W'
-            }else if(wind_dir<337.5){
-                wind_dir = 'NW'
-            }else wind_dir = 'N';
+        wind_dir = 'N'
+    }else if(wind_dir<67.5){
+        wind_dir = 'NE'
+    }else if(wind_dir<112.5){
+        wind_dir = 'E'
+    }else if(wind_dir<157.5){
+        wind_dir = 'SE'
+    }else if(wind_dir<202.5){
+        wind_dir = 'S'
+    }else if(wind_dir<247.5){
+        wind_dir = 'SW'
+    }else if(wind_dir<292.5){
+        wind_dir = 'W'
+    }else if(wind_dir<337.5){
+        wind_dir = 'NW'
+    }else wind_dir = 'N';                          
 
     wind.innerText = Math.round(dailyWeather.current.wind_speed) + ' m/s '+ wind_dir;
 }
 
+//Five Day Forecast Function------------------------------------------
 
-            
 function forecast(){
 
             const day1 = document.querySelector('#day1')

@@ -112,6 +112,10 @@ h1 {
     font-size: 20px;
  }
 
+ .list {
+     
+}
+
  /* -----Present Weather Section----- */
  .topBox {
     display: flex;
@@ -142,6 +146,10 @@ line-height: 2rem;
  }
 
  #icon {
+    text-align: center;
+}
+
+#description {
     text-align: center;
 }
 
@@ -192,6 +200,4 @@ line-height: 2rem;
      font-weight: lighter;
  }
 
- .list {
-     
- }
+ 
