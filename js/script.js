@@ -12,6 +12,7 @@ const icon = document.querySelector('#icon');
 const description = document.querySelector('#description');
 const temp = document.querySelector('#temp');
 var list = document.querySelector('.list')
+const present = document.querySelector('.present')
 
 var dailyWeather;
 var searchHistory = JSON.parse(localStorage.getItem('city')) || [];
@@ -24,9 +25,7 @@ searchBox.addEventListener('keypress', setCity);
 searchButton.addEventListener('click', search);
 const ul = document.querySelector('#ul');
 ul.addEventListener('click', historyClick);
-// if(searchHistory.length > 0){
-    
-//     }
+
  
 function search(){
     ul.innerHTML = '';
@@ -53,10 +52,6 @@ function setCity(enter){
 
 // History function--------------------------------------------
 
-    
-
-
-
 function setHistory(){
   
     for (let i = 0; i < searchHistory.length; i++) {
@@ -66,19 +61,11 @@ function setHistory(){
         ul.appendChild(li);
         li.classList.add('list')
     }
+} 
 
-    
-
-    console.log(searchHistory)
-}   
-
-// localStorage.clear()
-
-
+// Call some funcs
 setHistory();
 getWeather();
-
-
 
 // Fetch requests / History for-loop / Local Storage / City name-------------
 
@@ -134,14 +121,32 @@ function getWeather(){
 // Todays weather function----------------------------------------------
 
 function todaysWeather(){
-
-    temp.innerText =' ' + Math.round(dailyWeather.current.temp);
     var date = (dailyWeather.current.dt);
     var timestamp = moment.unix(date);
+    var uvIndex = dailyWeather.current.uvi;
+
+    temp.innerText =' ' + Math.round(dailyWeather.current.temp);
     cityDate.innerText = timestamp.format('dddd Do MMMM');
+
     icon.innerHTML = '<img src= ./assets/weatherIcons/'+ dailyWeather.current.weather[0].icon+'.png>';
+    present.style.background = "url('./assets/images/"+ dailyWeather.current.weather[0].icon+".jpg')";
+    present.style.backgroundSize = 'cover';
+    present.style.backgroundPosition= 'center';
+
     description.innerText = dailyWeather.current.weather[0].description;
-    uv.innerText = dailyWeather.current.uvi;
+    uv.innerText = '-- '+uvIndex+' --';
+
+    if(uvIndex<2){
+        uv.style.backgroundColor = 'green'
+    }else if(uvIndex<5){
+        uv.style.backgroundColor = 'yellow'
+    }else if(uvIndex<7){
+        uv.style.backgroundColor = 'orange'
+    }else if(uvIndex<10){
+        uv.style.backgroundColor = 'red'
+    }else uv.style.backgroundColor = 'purple'
+
+
     humidity.innerText = dailyWeather.current.humidity + ' %';
     var wind_dir = dailyWeather.current.wind_deg;
 
@@ -205,7 +210,6 @@ function forecast(){
             day3.children[4].innerText ='Humidity '+ dailyWeather.daily[3].humidity+'%'
             day4.children[4].innerText ='Humidity '+ dailyWeather.daily[4].humidity+'%'
             day5.children[4].innerText ='Humidity '+ dailyWeather.daily[5].humidity+'%'
-
            } 
 
 
