@@ -16,11 +16,14 @@ Below is the list of criteria
   
 
 ## Deployment  
-- This Project has been deployed to Github and is live on Github pages.  
-
+- This Project has been deployed to Github and is live on Github pages.
+ 
 - This is the link to the deployed webpage: https://brett-treweek.github.io/Simple-Weather-App/
 
 - This is the link to the Github Repository tha contains the code: https://github.com/brett-treweek/Simple-Weather-App
+
+- Custom fonts thanks to manifestinteractive. Check them out here https://github.com/manifestinteractive/weather-underground-icons 
+
 
 
 
