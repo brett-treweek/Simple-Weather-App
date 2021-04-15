@@ -22,7 +22,9 @@ Below is the list of criteria
 
 - Github Repository that contains the code: https://github.com/brett-treweek/Simple-Weather-App
 
-- Custom fonts thanks to manifestinteractive. Check them out here https://github.com/manifestinteractive/weather-underground-icons 
+- Custom icons thanks to manifestinteractive. Check them out here https://github.com/manifestinteractive/weather-underground-icons
+
+-Openweathermap is the API used for meteorological data. https://openweathermap.org/
 
 
 
