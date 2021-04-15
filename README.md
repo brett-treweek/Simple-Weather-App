@@ -24,7 +24,7 @@ Below is the list of criteria
 
 - Custom icons thanks to manifestinteractive. Check them out here https://github.com/manifestinteractive/weather-underground-icons
 
--Openweathermap is the API used for meteorological data. https://openweathermap.org/
+- Openweathermap is the API used for meteorological data. https://openweathermap.org/
 
 
 
